@@ -3,7 +3,10 @@ import { join } from "path";
 import XLSX from "xlsx";
 import { requireHost } from "../../../lib/auth";
 
-const RSVPS_FILE = join(process.cwd(), "data", "rsvps.json");
+// Same path as RSVP route (use /tmp on Vercel)
+const RSVPS_FILE = process.env.VERCEL
+  ? join("/tmp", "data", "rsvps.json")
+  : join(process.cwd(), "data", "rsvps.json");
 
 export async function GET(request) {
   const result = requireHost(request);
