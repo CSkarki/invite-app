@@ -69,6 +69,24 @@ export default function InvitePage() {
   return (
     <main className={styles.invite}>
       <div className={styles.invite__layout}>
+        
+      <div className={styles.invite__imageWrap}>
+          {!imageError ? (
+            <Image
+              src="/invite-image.jpg"
+              alt="Event invitation"
+              fill
+              className={styles.invite__image}
+              sizes="50vw"
+              priority
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className={styles.invite__imagePlaceholder}>
+              Add your image as <code>public/invite-image.jpg</code>
+            </div>
+          )}
+        </div>
         <div className={styles.invite__content}>
           <div className={styles.invite__contentInner}>
             <div className={styles.invite__titleWrap}>
@@ -174,23 +192,6 @@ export default function InvitePage() {
           </div>
         </div>
 
-        <div className={styles.invite__imageWrap}>
-          {!imageError ? (
-            <Image
-              src="/invite-image.jpg"
-              alt="Event invitation"
-              fill
-              className={styles.invite__image}
-              sizes="50vw"
-              priority
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <div className={styles.invite__imagePlaceholder}>
-              Add your image as <code>public/invite-image.jpg</code>
-            </div>
-          )}
-        </div>
       </div>
     </main>
   );
