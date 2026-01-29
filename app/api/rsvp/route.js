@@ -1,29 +1,4 @@
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import { join } from "path";
-
-// Vercel serverless: filesystem is read-only except /tmp
-const DATA_DIR = process.env.VERCEL ? "/tmp/data" : join(process.cwd(), "data");
-const RSVPS_FILE = join(DATA_DIR, "rsvps.json");
-
-function getRsvps() {
-  if (!existsSync(RSVPS_FILE)) {
-    return [];
-  }
-  try {
-    const raw = readFileSync(RSVPS_FILE, "utf8");
-    const data = JSON.parse(raw);
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveRsvps(rows) {
-  if (!existsSync(DATA_DIR)) {
-    mkdirSync(DATA_DIR, { recursive: true });
-  }
-  writeFileSync(RSVPS_FILE, JSON.stringify(rows, null, 2), "utf8");
-}
+import { addRsvp } from "../../../lib/rsvp-store";
 
 export async function POST(request) {
   let body;
@@ -42,15 +17,7 @@ export async function POST(request) {
   }
 
   try {
-    const rows = getRsvps();
-    rows.push({
-      timestamp: new Date().toISOString(),
-      name: String(name).trim(),
-      email: String(email).trim(),
-      attending: String(attending).trim(),
-      message: message != null ? String(message).trim() : "",
-    });
-    saveRsvps(rows);
+    await addRsvp({ name, email, attending, message });
     return Response.json({ ok: true });
   } catch (err) {
     console.error("RSVP API error:", err.message);

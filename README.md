@@ -1,6 +1,6 @@
 # Invite App (Evite-style)
 
-A minimal invite site you can share as a link. Guests RSVP with name, email, attending (Yes/No), and an optional message. Responses are stored in a **local JSON file** (`data/rsvps.json`). Only the host can view and download RSVPs (see Host page below).
+A minimal invite site you can share as a link. Guests RSVP with name, email, attending (Yes/No), and an optional message. Responses are stored in a **local JSON file** (`data/rsvps.json`) by default, or in **Supabase (Postgres)** when `DATABASE_URL` is set. Only the host can view and download RSVPs (see Host page below).
 
 ## Quick start
 
@@ -18,7 +18,9 @@ A minimal invite site you can share as a link. Guests RSVP with name, email, att
    ```
    Open [http://localhost:3000](http://localhost:3000). Share that URL as the invite link.
 
-No Google or env setup needed. RSVPs are appended to `data/rsvps.json` (created automatically). The `data/` folder is in `.gitignore` so guest data is not committed.
+No database required for local dev. RSVPs are appended to `data/rsvps.json` (created automatically). The `data/` folder is in `.gitignore` so guest data is not committed.
+
+**Production (e.g. Vercel):** Set `DATABASE_URL` to your Supabase Postgres connection string (Settings → Database → Connection string). Create the table with `supabase-invite-rsvps.sql` in the Supabase SQL Editor. RSVPs will then persist in Supabase instead of ephemeral storage.
 
 3. **Host page (view & download RSVPs)**  
    Add to `.env.local` (restart dev server after changes):

@@ -1,12 +1,6 @@
-import { readFileSync, existsSync } from "fs";
-import { join } from "path";
 import XLSX from "xlsx";
 import { requireHost } from "../../../lib/auth";
-
-// Same path as RSVP route (use /tmp on Vercel)
-const RSVPS_FILE = process.env.VERCEL
-  ? join("/tmp", "data", "rsvps.json")
-  : join(process.cwd(), "data", "rsvps.json");
+import { listRsvps } from "../../../lib/rsvp-store";
 
 export async function GET(request) {
   const result = requireHost(request);
@@ -14,22 +8,7 @@ export async function GET(request) {
     return new Response("Unauthorized", { status: 401 });
   }
   try {
-    if (!existsSync(RSVPS_FILE)) {
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet([["Timestamp", "Name", "Email", "Attending", "Message"]]);
-      XLSX.utils.book_append_sheet(wb, ws, "RSVPs");
-      const buf = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
-      return new Response(buf, {
-        headers: {
-          "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          "Content-Disposition": 'attachment; filename="rsvps.xlsx"',
-        },
-      });
-    }
-
-    const raw = readFileSync(RSVPS_FILE, "utf8");
-    const rows = JSON.parse(raw);
-    const arr = Array.isArray(rows) ? rows : [];
+    const arr = await listRsvps();
     const head = ["Timestamp", "Name", "Email", "Attending", "Message"];
     const data = [head, ...arr.map((r) => [r.timestamp, r.name, r.email, r.attending, r.message || ""])];
 

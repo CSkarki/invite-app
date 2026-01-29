@@ -1,10 +1,5 @@
-import { readFileSync, existsSync } from "fs";
-import { join } from "path";
 import { requireHost } from "../../../../lib/auth";
-
-const RSVPS_FILE = process.env.VERCEL
-  ? join("/tmp", "data", "rsvps.json")
-  : join(process.cwd(), "data", "rsvps.json");
+import { listRsvps } from "../../../../lib/rsvp-store";
 
 export async function GET(request) {
   const result = requireHost(request);
@@ -12,9 +7,8 @@ export async function GET(request) {
     return new Response("Unauthorized", { status: 401 });
   }
   try {
-    const raw = existsSync(RSVPS_FILE)
-      ? readFileSync(RSVPS_FILE, "utf8")
-      : "[]";
+    const rows = await listRsvps();
+    const raw = JSON.stringify(rows, null, 2);
     return new Response(raw, {
       headers: {
         "Content-Type": "application/json",
