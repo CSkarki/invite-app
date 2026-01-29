@@ -1,7 +1,8 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
 
-const DATA_DIR = join(process.cwd(), "data");
+// Vercel serverless: filesystem is read-only except /tmp
+const DATA_DIR = process.env.VERCEL ? "/tmp/data" : join(process.cwd(), "data");
 const RSVPS_FILE = join(DATA_DIR, "rsvps.json");
 
 function getRsvps() {

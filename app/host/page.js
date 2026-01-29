@@ -41,7 +41,7 @@ export default function HostPage() {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setLoginError(data.error || "Login failed");
+      setLoginError(data.error || "Login failed. Check username and password.");
       return;
     }
     setLoggedIn(true);
