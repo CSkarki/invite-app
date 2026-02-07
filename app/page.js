@@ -73,7 +73,7 @@ export default function InvitePage() {
       <div className={styles.invite__imageWrap}>
           {!imageError ? (
             <Image
-              src="/invite-image.jpg"
+              src="/InviteImage.jpg"
               alt="Event invitation"
               fill
               className={styles.invite__image}
