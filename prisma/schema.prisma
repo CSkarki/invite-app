@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model Invitation {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  slug              String   @unique
+  eventName         String   @map("event_name")
+  eventDate         DateTime? @map("event_date")
+  eventTime         String?  @map("event_time")
+  locationOrLink    String?  @map("location_or_link")
+  message           String?  @db.Text
+  imageUrl          String?  @map("image_url")
+  themeId           String?  @map("theme_id")
+  themeConfig       Json?    @map("theme_config")
+  ownerPlan         String?  @map("owner_plan")
+  published         Boolean  @default(false)
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  rsvps             InviteRsvp[]
+
+  @@map("invitations")
+}
+
+model InviteRsvp {
+  id             String   @id @default(uuid())
+  invitationId   String   @map("invitation_id")
+  name           String
+  email          String
+  attending      String
+  message        String?  @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+  invitation     Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@map("invite_rsvps")
+}

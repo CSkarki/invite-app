@@ -1,15 +1,37 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap");
 
-:root {
-  --bg: #f5f3ef;
-  --surface: #ffffff;
-  --border: #e5e2dc;
-  --text: #1a1a1a;
-  --text-muted: #5c5c5c;
-  --accent: #b8954a;
-  --accent-dim: rgba(184, 149, 74, 0.15);
-  --success: #16a34a;
-  --error: #dc2626;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: "Outfit", system-ui, sans-serif;
+    --font-serif: "Cormorant Garamond", Georgia, serif;
+
+    --background: #f5f3ef;
+    --foreground: #1a1a1a;
+    --surface: #ffffff;
+    --border: #e5e2dc;
+
+    --accent: #b8954a;
+    --accent-foreground: #ffffff;
+    --accent-light: #f5eed9;
+
+    --muted: #6b6b6b;
+    --muted-foreground: #999999;
+
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --error: #dc2626;
+    --error-light: #fee2e2;
+
+    /* Legacy vars used by CSS modules */
+    --bg: #f5f3ef;
+    --text: #1a1a1a;
+    --text-muted: #6b6b6b;
+    --accent-dim: rgba(184, 149, 74, 0.15);
+  }
 }
 
 * {
@@ -23,18 +45,20 @@ html {
 }
 
 body {
-  font-family: "Outfit", sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  font-family: var(--font-sans);
+  background: var(--background);
+  color: var(--foreground);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2 {
-  font-family: "Cormorant Garamond", serif;
+h1,
+h2 {
+  font-family: var(--font-serif);
   font-weight: 600;
 }
 
-button, input, textarea {
+input,
+textarea {
   font-family: inherit;
 }
