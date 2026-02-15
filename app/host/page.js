@@ -104,6 +104,12 @@ export default function HostPage() {
       <div className={styles.header}>
         <h1 className={styles.title}>RSVPs</h1>
         <div className={styles.actions}>
+          <a href="/host/reminders" className={styles.download}>
+            Send Reminders
+          </a>
+          <a href="/host/thankyou" className={styles.download}>
+            Send Thank You
+          </a>
           <a href="/api/export" download="rsvps.xlsx" className={styles.download}>
             Download Excel
           </a>
