@@ -5,9 +5,11 @@ import styles from "./page.module.css";
 
 export default function GalleryPage() {
   const [verified, setVerified] = useState(null); // null = checking, true/false
+  const [step, setStep] = useState("email"); // "email" | "code"
   const [email, setEmail] = useState("");
-  const [verifying, setVerifying] = useState(false);
-  const [verifyError, setVerifyError] = useState("");
+  const [code, setCode] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const [photos, setPhotos] = useState([]);
   const [loadingPhotos, setLoadingPhotos] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState(null);
@@ -29,12 +31,13 @@ export default function GalleryPage() {
       .catch(() => setVerified(false));
   }, []);
 
-  async function handleVerify(e) {
+  // Step 1: Send OTP to email
+  async function handleSendCode(e) {
     e.preventDefault();
     if (!email.trim()) return;
 
-    setVerifying(true);
-    setVerifyError("");
+    setSubmitting(true);
+    setError("");
 
     try {
       const res = await fetch("/api/gallery/verify", {
@@ -46,16 +49,79 @@ export default function GalleryPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setVerifyError(data.error || "Verification failed.");
+        setError(data.error || "Verification failed.");
         return;
       }
 
-      setVerified(true);
-      loadPhotos();
+      if (data.codeSent) {
+        setStep("code");
+      }
     } catch {
-      setVerifyError("Network error. Try again.");
+      setError("Network error. Try again.");
     } finally {
-      setVerifying(false);
+      setSubmitting(false);
+    }
+  }
+
+  // Step 2: Verify OTP code
+  async function handleVerifyCode(e) {
+    e.preventDefault();
+    if (!code.trim()) return;
+
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/gallery/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: email.trim(), code: code.trim() }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Invalid code.");
+        return;
+      }
+
+      if (data.verified) {
+        setVerified(true);
+        loadPhotos();
+      }
+    } catch {
+      setError("Network error. Try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  // Resend code
+  async function handleResend() {
+    setCode("");
+    setError("");
+    setStep("email");
+    // Re-submit email to get a new code
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/gallery/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Failed to resend code.");
+        return;
+      }
+      if (data.codeSent) {
+        setStep("code");
+      }
+    } catch {
+      setError("Network error. Try again.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -95,33 +161,88 @@ export default function GalleryPage() {
     );
   }
 
-  // Email verification form
+  // Verification flow
   if (!verified) {
     return (
       <main className={styles.gallery}>
         <div className={styles.verifyCard}>
           <h1 className={styles.verifyTitle}>Event Gallery</h1>
-          <p className={styles.verifySubtitle}>
-            Enter your RSVP email to view event photos
-          </p>
-          <form onSubmit={handleVerify} className={styles.verifyForm}>
-            <input
-              type="email"
-              className={styles.input}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-            />
-            {verifyError && <p className={styles.error}>{verifyError}</p>}
-            <button
-              type="submit"
-              className={styles.submitBtn}
-              disabled={verifying}
-            >
-              {verifying ? "Verifying..." : "View Photos"}
-            </button>
-          </form>
+
+          {step === "email" ? (
+            <>
+              <p className={styles.verifySubtitle}>
+                Enter your RSVP email to receive a verification code
+              </p>
+              <form onSubmit={handleSendCode} className={styles.verifyForm}>
+                <input
+                  type="email"
+                  className={styles.input}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                />
+                {error && <p className={styles.error}>{error}</p>}
+                <button
+                  type="submit"
+                  className={styles.submitBtn}
+                  disabled={submitting}
+                >
+                  {submitting ? "Sending code..." : "Send Verification Code"}
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <p className={styles.verifySubtitle}>
+                We sent a 6-digit code to <strong>{email}</strong>
+              </p>
+              <form onSubmit={handleVerifyCode} className={styles.verifyForm}>
+                <input
+                  type="text"
+                  className={`${styles.input} ${styles.codeInput}`}
+                  value={code}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                    setCode(val);
+                  }}
+                  placeholder="000000"
+                  maxLength={6}
+                  autoFocus
+                  required
+                />
+                {error && <p className={styles.error}>{error}</p>}
+                <button
+                  type="submit"
+                  className={styles.submitBtn}
+                  disabled={submitting || code.length < 6}
+                >
+                  {submitting ? "Verifying..." : "Verify & View Photos"}
+                </button>
+                <div className={styles.resendRow}>
+                  <button
+                    type="button"
+                    className={styles.resendBtn}
+                    onClick={handleResend}
+                    disabled={submitting}
+                  >
+                    Resend code
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.resendBtn}
+                    onClick={() => {
+                      setStep("email");
+                      setCode("");
+                      setError("");
+                    }}
+                  >
+                    Change email
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
         </div>
       </main>
     );

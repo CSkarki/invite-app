@@ -75,6 +75,38 @@
   cursor: not-allowed;
 }
 
+.codeInput {
+  font-size: 1.75rem;
+  letter-spacing: 0.5rem;
+  font-weight: 600;
+  padding: 0.85rem;
+}
+
+.resendRow {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.resendBtn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.resendBtn:hover {
+  color: #d4b96d;
+}
+
+.resendBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .error {
   font-size: 0.9rem;
   color: var(--error, #ef4444);
