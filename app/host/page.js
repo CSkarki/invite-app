@@ -110,6 +110,9 @@ export default function HostPage() {
           <a href="/host/thankyou" className={styles.download}>
             Send Thank You
           </a>
+          <a href="/host/gallery" className={styles.download}>
+            Manage Gallery
+          </a>
           <a href="/api/export" download="rsvps.xlsx" className={styles.download}>
             Download Excel
           </a>

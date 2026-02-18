@@ -184,6 +184,8 @@ export default function InvitePage() {
                     {loading ? "Sending…" : "Send RSVP"}
                   </button>
                   <p className={styles.invite__export}>
+                    <a href="/gallery">View Event Photos</a>
+                    {" | "}
                     <a href="/host">Host: view &amp; download RSVPs</a>
                   </p>
                 </footer>
