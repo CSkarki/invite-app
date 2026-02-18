@@ -220,3 +220,83 @@
 .lightboxClose:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+.lightboxNav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  font-size: 2.5rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightboxNav:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.lightboxPrev {
+  left: 1rem;
+}
+
+.lightboxNext {
+  right: 1rem;
+}
+
+/* Album cards */
+.albumGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.albumCard {
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  text-align: center;
+}
+
+.albumCard:hover {
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+
+.albumName {
+  font-size: 1.1rem;
+}
+
+/* Breadcrumb */
+.albumBreadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.albumBackBtn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.albumBackBtn:hover {
+  color: #d4b96d;
+}
+
+.breadcrumbSep {
+  color: var(--text-muted);
+}

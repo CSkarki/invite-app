@@ -38,10 +38,143 @@
   color: var(--accent);
   text-decoration: none;
   font-size: 0.9rem;
+  cursor: pointer;
 }
 
 .backLink:hover {
   border-color: var(--accent);
+}
+
+.createBtn {
+  padding: 0.5rem 1.25rem;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.createBtn:hover {
+  background: #d4b96d;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.breadcrumbBack {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.breadcrumbBack:hover {
+  color: #d4b96d;
+}
+
+.breadcrumbSep {
+  color: var(--text-muted);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tabActive {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Album grid */
+.albumGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.albumCard {
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.albumCard:hover {
+  border-color: var(--accent);
+  transform: scale(1.01);
+}
+
+.albumName {
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.albumStat {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.albumCardActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.albumEditBtn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.albumEditBtn:hover {
+  color: #d4b96d;
+}
+
+.albumDeleteBtn {
+  background: none;
+  border: none;
+  color: var(--error, #ef4444);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.albumDeleteBtn:hover {
+  opacity: 0.8;
 }
 
 /* Upload area */
@@ -117,10 +250,21 @@
   object-fit: cover;
 }
 
-.deleteBtn {
+.photoActions {
   position: absolute;
   top: 6px;
   right: 6px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.photoItem:hover .photoActions {
+  opacity: 1;
+}
+
+.deleteBtn {
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -132,16 +276,213 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-.photoItem:hover .deleteBtn {
-  opacity: 1;
 }
 
 .deleteBtn:hover {
   background: rgba(239, 68, 68, 1);
+}
+
+.moveBtn,
+.copyBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(100, 100, 100, 0.85);
+  color: #fff;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.moveBtn:hover,
+.copyBtn:hover {
+  background: rgba(100, 100, 100, 1);
+}
+
+/* Share panel */
+.sharePanel {
+  margin-top: 1rem;
+}
+
+.shareAddRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.shareSelect {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.shareSelect:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.shareAddBtn {
+  padding: 0.55rem 1rem;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.shareAddBtn:hover {
+  background: #d4b96d;
+}
+
+.shareAddBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shareAllBtn {
+  padding: 0.55rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.shareAllBtn:hover {
+  border-color: var(--accent);
+}
+
+.shareList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shareItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.revokeBtn {
+  background: none;
+  border: none;
+  color: var(--error, #ef4444);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.revokeBtn:hover {
+  opacity: 0.8;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modalCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 100%;
+}
+
+.modalCard h3 {
+  margin-bottom: 1rem;
+}
+
+.modalHint {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.submitBtn {
+  padding: 0.6rem 1.25rem;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.submitBtn:hover {
+  background: #d4b96d;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Legacy banner */
+.legacyBanner {
+  padding: 1rem 1.25rem;
+  background: rgba(196, 164, 90, 0.1);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.legacyActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  align-items: center;
 }
 
 .empty {

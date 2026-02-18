@@ -10,15 +10,21 @@ export default function GalleryPage() {
   const [code, setCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  // Albums & photos
+  const [view, setView] = useState("albums"); // "albums" | "photos"
+  const [albums, setAlbums] = useState([]);
+  const [loadingAlbums, setLoadingAlbums] = useState(false);
+  const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [loadingPhotos, setLoadingPhotos] = useState(false);
-  const [lightboxUrl, setLightboxUrl] = useState(null);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   const opts = { credentials: "include" };
 
   // Check if already verified (existing cookie)
   useEffect(() => {
-    fetch("/api/gallery/photos", opts)
+    fetch("/api/gallery/albums/guest", opts)
       .then((r) => {
         if (r.ok) {
           setVerified(true);
@@ -27,7 +33,7 @@ export default function GalleryPage() {
         setVerified(false);
         return [];
       })
-      .then((data) => setPhotos(Array.isArray(data) ? data : []))
+      .then((data) => setAlbums(Array.isArray(data) ? data : []))
       .catch(() => setVerified(false));
   }, []);
 
@@ -87,7 +93,7 @@ export default function GalleryPage() {
 
       if (data.verified) {
         setVerified(true);
-        loadPhotos();
+        loadAlbums();
       }
     } catch {
       setError("Network error. Try again.");
@@ -101,7 +107,6 @@ export default function GalleryPage() {
     setCode("");
     setError("");
     setStep("email");
-    // Re-submit email to get a new code
     setSubmitting(true);
     try {
       const res = await fetch("/api/gallery/verify", {
@@ -125,26 +130,51 @@ export default function GalleryPage() {
     }
   }
 
-  async function loadPhotos() {
+  async function loadAlbums() {
+    setLoadingAlbums(true);
+    try {
+      const res = await fetch("/api/gallery/albums/guest", opts);
+      if (res.ok) {
+        const data = await res.json();
+        setAlbums(Array.isArray(data) ? data : []);
+      }
+    } catch {}
+    setLoadingAlbums(false);
+  }
+
+  async function openAlbum(album) {
+    setSelectedAlbum(album);
+    setView("photos");
     setLoadingPhotos(true);
     try {
-      const res = await fetch("/api/gallery/photos", opts);
+      const res = await fetch(`/api/gallery/albums/${album.id}/photos`, opts);
       if (res.ok) {
         const data = await res.json();
         setPhotos(Array.isArray(data) ? data : []);
       }
-    } catch {
-      // silent
-    } finally {
-      setLoadingPhotos(false);
-    }
+    } catch {}
+    setLoadingPhotos(false);
+  }
+
+  function goBackToAlbums() {
+    setView("albums");
+    setSelectedAlbum(null);
+    setPhotos([]);
+    setLightboxIndex(null);
   }
 
   const handleKeyDown = useCallback(
     (e) => {
-      if (e.key === "Escape" && lightboxUrl) setLightboxUrl(null);
+      if (lightboxIndex === null) return;
+      if (e.key === "Escape") setLightboxIndex(null);
+      if (e.key === "ArrowRight" && lightboxIndex < photos.length - 1) {
+        setLightboxIndex(lightboxIndex + 1);
+      }
+      if (e.key === "ArrowLeft" && lightboxIndex > 0) {
+        setLightboxIndex(lightboxIndex - 1);
+      }
     },
-    [lightboxUrl]
+    [lightboxIndex, photos.length]
   );
 
   useEffect(() => {
@@ -248,7 +278,89 @@ export default function GalleryPage() {
     );
   }
 
-  // Gallery view
+  // Photos within an album
+  if (view === "photos" && selectedAlbum) {
+    return (
+      <main className={styles.gallery}>
+        <div className={styles.header}>
+          <div className={styles.albumBreadcrumb}>
+            <button className={styles.albumBackBtn} onClick={goBackToAlbums}>
+              Albums
+            </button>
+            <span className={styles.breadcrumbSep}>/</span>
+            <h1 className={styles.title}>{selectedAlbum.name}</h1>
+          </div>
+          <a href="/" className={styles.backLink}>
+            Back to Invite
+          </a>
+        </div>
+
+        {loadingPhotos ? (
+          <p className={styles.loading}>Loading photos...</p>
+        ) : photos.length === 0 ? (
+          <p className={styles.empty}>No photos in this album yet.</p>
+        ) : (
+          <div className={styles.photoGrid}>
+            {photos.map((photo, i) => (
+              <div
+                key={photo.path}
+                className={styles.photoItem}
+                onClick={() => setLightboxIndex(i)}
+              >
+                <img src={photo.url} alt={photo.name} loading="lazy" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {lightboxIndex !== null && photos[lightboxIndex] && (
+          <div
+            className={styles.lightbox}
+            onClick={() => setLightboxIndex(null)}
+          >
+            <button
+              className={styles.lightboxClose}
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxIndex(null);
+              }}
+            >
+              x
+            </button>
+            {lightboxIndex > 0 && (
+              <button
+                className={`${styles.lightboxNav} ${styles.lightboxPrev}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex(lightboxIndex - 1);
+                }}
+              >
+                &#8249;
+              </button>
+            )}
+            <img
+              src={photos[lightboxIndex].url}
+              alt="Full size"
+              onClick={(e) => e.stopPropagation()}
+            />
+            {lightboxIndex < photos.length - 1 && (
+              <button
+                className={`${styles.lightboxNav} ${styles.lightboxNext}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex(lightboxIndex + 1);
+                }}
+              >
+                &#8250;
+              </button>
+            )}
+          </div>
+        )}
+      </main>
+    );
+  }
+
+  // Albums view (default after verification)
   return (
     <main className={styles.gallery}>
       <div className={styles.header}>
@@ -258,43 +370,21 @@ export default function GalleryPage() {
         </a>
       </div>
 
-      {loadingPhotos ? (
-        <p className={styles.loading}>Loading photos...</p>
-      ) : photos.length === 0 ? (
-        <p className={styles.empty}>No photos have been shared yet.</p>
+      {loadingAlbums ? (
+        <p className={styles.loading}>Loading albums...</p>
+      ) : albums.length === 0 ? (
+        <p className={styles.empty}>No albums have been shared with you yet.</p>
       ) : (
-        <div className={styles.photoGrid}>
-          {photos.map((photo) => (
+        <div className={styles.albumGrid}>
+          {albums.map((album) => (
             <div
-              key={photo.name}
-              className={styles.photoItem}
-              onClick={() => setLightboxUrl(photo.url)}
+              key={album.id}
+              className={styles.albumCard}
+              onClick={() => openAlbum(album)}
             >
-              <img src={photo.url} alt={photo.name} loading="lazy" />
+              <h3 className={styles.albumName}>{album.name}</h3>
             </div>
           ))}
-        </div>
-      )}
-
-      {lightboxUrl && (
-        <div
-          className={styles.lightbox}
-          onClick={() => setLightboxUrl(null)}
-        >
-          <button
-            className={styles.lightboxClose}
-            onClick={(e) => {
-              e.stopPropagation();
-              setLightboxUrl(null);
-            }}
-          >
-            x
-          </button>
-          <img
-            src={lightboxUrl}
-            alt="Full size"
-            onClick={(e) => e.stopPropagation()}
-          />
         </div>
       )}
     </main>
